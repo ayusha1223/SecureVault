@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
 import ProtectedRoute from "./routes/ProtectedRoute";
-
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -13,8 +11,11 @@ import PasswordGenerator from "./pages/vault/PasswordGenerator";
 import Categories from "./pages/category/Categories";
 import CategoryVaults from "./pages/category/CategoryVaults";
 import Favourites from "./pages/favourite/Favourites";
-
+import Security from "./pages/security/Security";
+import Profile from "./pages/profile/Profile";
+import Settings from "./pages/settings/Settings";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Audit from "./pages/audit/Audit";
 
 function App() {
   return (
@@ -46,10 +47,34 @@ function App() {
   
 />
 <Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/audit"
+  element={
+    <ProtectedRoute>
+      <Audit />
+    </ProtectedRoute>
+  }
+/>
+<Route
   path="/generator"
   element={
     <ProtectedRoute>
       <PasswordGenerator />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/settings"
+  element={
+    <ProtectedRoute>
+      <Settings />
     </ProtectedRoute>
   }
 />
@@ -87,6 +112,14 @@ function App() {
   element={
     <ProtectedRoute>
       <Favourites />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/security"
+  element={
+    <ProtectedRoute>
+      <Security />
     </ProtectedRoute>
   }
 />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiCopy,
   FiRefreshCw,
@@ -9,41 +9,53 @@ import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { generatePassword } from "../../utils/passwordGenerator";
 
 const PasswordGenerator = () => {
-  const [length, setLength] = useState(16);
-
-  const [options, setOptions] = useState({
+  const [settings, setSettings] = useState({
+    defaultLength: 16,
     uppercase: true,
     lowercase: true,
     numbers: true,
     symbols: true,
   });
 
-  const [password, setPassword] = useState(
-    generatePassword({
-      length: 16,
-      ...options,
-    })
-  );
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("settings");
+
+    if (saved) {
+      const s = JSON.parse(saved);
+
+      setSettings(s);
+
+      setPassword(
+        generatePassword({
+          length: s.defaultLength,
+          uppercase: s.uppercase,
+          lowercase: s.lowercase,
+          numbers: s.numbers,
+          symbols: s.symbols,
+        })
+      );
+    } else {
+      generate();
+    }
+  }, []);
 
   const generate = () => {
     setPassword(
       generatePassword({
-        length,
-        ...options,
+        length: settings.defaultLength,
+        uppercase: settings.uppercase,
+        lowercase: settings.lowercase,
+        numbers: settings.numbers,
+        symbols: settings.symbols,
       })
     );
   };
 
   const copy = () => {
     navigator.clipboard.writeText(password);
-    toast.success("Copied");
-  };
-
-  const toggle = (name) => {
-    setOptions((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
+    toast.success("Password Copied");
   };
 
   return (
@@ -55,12 +67,16 @@ const PasswordGenerator = () => {
           Password Generator
         </h1>
 
+        <p className="mt-2 text-slate-500">
+          Uses your Settings automatically.
+        </p>
+
         <div className="mt-8 flex">
 
           <input
             readOnly
             value={password}
-            className="flex-1 rounded-l-xl border border-r-0 p-4 font-mono text-lg"
+            className="flex-1 rounded-l-xl border border-r-0 p-4 font-mono"
           />
 
           <button
@@ -79,70 +95,63 @@ const PasswordGenerator = () => {
 
         </div>
 
-        <div className="mt-8">
+        <div className="mt-10 rounded-2xl bg-slate-100 p-6">
 
-          <label className="font-semibold">
-            Length : {length}
-          </label>
+          <h2 className="mb-4 text-xl font-bold">
+            Current Settings
+          </h2>
 
-          <input
-            type="range"
-            min="8"
-            max="64"
-            value={length}
-            onChange={(e) =>
-              setLength(Number(e.target.value))
-            }
-            className="mt-3 w-full"
-          />
+          <div className="grid gap-3 md:grid-cols-2">
 
-        </div>
+            <p>
+              Length:
+              <strong>
+                {" "}
+                {settings.defaultLength}
+              </strong>
+            </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <p>
+              Uppercase:
+              <strong>
+                {" "}
+                {settings.uppercase
+                  ? "Yes"
+                  : "No"}
+              </strong>
+            </p>
 
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={options.uppercase}
-              onChange={() =>
-                toggle("uppercase")
-              }
-            />
-            Uppercase
-          </label>
+            <p>
+              Lowercase:
+              <strong>
+                {" "}
+                {settings.lowercase
+                  ? "Yes"
+                  : "No"}
+              </strong>
+            </p>
 
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={options.lowercase}
-              onChange={() =>
-                toggle("lowercase")
-              }
-            />
-            Lowercase
-          </label>
+            <p>
+              Numbers:
+              <strong>
+                {" "}
+                {settings.numbers
+                  ? "Yes"
+                  : "No"}
+              </strong>
+            </p>
 
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={options.numbers}
-              onChange={() =>
-                toggle("numbers")
-              }
-            />
-            Numbers
-          </label>
+            <p>
+              Symbols:
+              <strong>
+                {" "}
+                {settings.symbols
+                  ? "Yes"
+                  : "No"}
+              </strong>
+            </p>
 
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={options.symbols}
-              onChange={() =>
-                toggle("symbols")
-              }
-            />
-            Symbols
-          </label>
+          </div>
 
         </div>
 
