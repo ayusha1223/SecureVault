@@ -7,6 +7,7 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
+import Vault from "./pages/vault/Vault";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 
@@ -35,6 +36,14 @@ function App() {
         path="/verify-email/:token"
         element={<VerifyEmail />}
       />
+      <Route
+  path="/vault"
+  element={
+    <ProtectedRoute>
+      <Vault />
+    </ProtectedRoute>
+  }
+/>
 
       {/* Protected */}
 
