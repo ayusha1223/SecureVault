@@ -33,7 +33,7 @@ const Login = () => {
 
       const { data } = await api.post("/auth/login", form);
 
-      login(data.accessToken, data.refreshToken);
+      login(data.user, data.accessToken);
 
       toast.success("Welcome back!");
 

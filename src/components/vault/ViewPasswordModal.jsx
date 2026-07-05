@@ -7,18 +7,41 @@ const ViewPasswordModal = ({ vault, onClose }) => {
 
   if (!vault) return null;
 
-  const copyPassword = () => {
-    navigator.clipboard.writeText(vault.password);
-    toast.success("Password copied");
+  const copyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(vault.password);
+
+      toast.success("Password copied");
+
+      const settings = JSON.parse(
+        localStorage.getItem("settings") || "{}"
+      );
+
+      // Default = 30 seconds
+      const seconds =
+        settings.clipboardAutoClear || 30;
+
+      setTimeout(async () => {
+        try {
+          await navigator.clipboard.writeText("");
+
+          toast.success(
+            "Clipboard cleared automatically"
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      }, seconds * 1000);
+    } catch (err) {
+      toast.error("Failed to copy password");
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-
       <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
 
         <div className="mb-8 flex items-center justify-between">
-
           <div>
             <h2 className="text-3xl font-bold">
               {vault.websiteName}
@@ -35,7 +58,6 @@ const ViewPasswordModal = ({ vault, onClose }) => {
           >
             <FiX size={22} />
           </button>
-
         </div>
 
         <div className="space-y-5">
@@ -88,7 +110,7 @@ const ViewPasswordModal = ({ vault, onClose }) => {
 
               <button
                 onClick={copyPassword}
-                className="rounded-r-xl border px-4"
+                className="rounded-r-xl border px-4 hover:bg-slate-100"
               >
                 <FiCopy />
               </button>
@@ -107,7 +129,6 @@ const ViewPasswordModal = ({ vault, onClose }) => {
         </button>
 
       </div>
-
     </div>
   );
 };
