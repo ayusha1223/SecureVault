@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
-import { getVaults } from "../../services/vaultService";
+import VaultCard from "../../components/vault/VaultCard";
+import {
+  getVaults,
+  deleteVault,
+  toggleFavourite,
+} from "../../services/vaultService";
+
 
 const Vault = () => {
   const [vaults, setVaults] = useState([]);
@@ -21,6 +27,35 @@ const Vault = () => {
       setLoading(false);
     }
   };
+  const handleDelete = async (id) => {
+  try {
+    await deleteVault(id);
+
+    setVaults((prev) =>
+      prev.filter((vault) => vault._id !== id)
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const handleFavourite = async (id) => {
+  try {
+    await toggleFavourite(id);
+
+    loadVaults();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const handleView = (vault) => {
+  console.log(vault);
+};
+
+const handleEdit = (vault) => {
+  console.log(vault);
+};
 
   return (
     <DashboardLayout>
@@ -39,29 +74,17 @@ const Vault = () => {
           <p>Loading...</p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {vaults.map((vault) => (
-              <div
-                key={vault._id}
-                className="rounded-2xl border bg-white p-6 shadow-sm"
-              >
-                <h2 className="text-xl font-bold">
-                  {vault.websiteName}
-                </h2>
-
-                <p className="mt-2 text-slate-500">
-                  {vault.username}
-                </p>
-
-                <p className="mt-2 text-sm">
-                  {vault.email}
-                </p>
-
-                <span className="mt-4 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
-                  {vault.category}
-                </span>
-              </div>
-            ))}
-          </div>
+  {vaults.map((vault) => (
+    <VaultCard
+      key={vault._id}
+      vault={vault}
+      onDelete={handleDelete}
+      onEdit={handleEdit}
+      onView={handleView}
+      onFavourite={handleFavourite}
+    />
+  ))}
+</div>
         )}
       </div>
     </DashboardLayout>
