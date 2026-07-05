@@ -25,31 +25,56 @@ const Login = () => {
     });
   };
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
+ const submitHandler = async (e) => {
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const { data } = await api.post("/auth/login", form);
+    const { data } = await api.post(
+      "/auth/login",
+      form
+    );
 
-      login(data.user, data.accessToken);
-
-toast.success("Welcome back!");
-
-if (data.user.role === "admin") {
-  navigate("/admin");
-} else {
-  navigate("/dashboard");
-}
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Login failed"
+    // MFA required
+    if (data.requiresMFA) {
+      sessionStorage.setItem(
+        "mfaUserId",
+        data.userId
       );
-    } finally {
-      setLoading(false);
+
+      sessionStorage.setItem(
+        "mfaEmail",
+        data.email
+      );
+
+      toast.success(data.message);
+
+      navigate("/verify-otp");
+
+      return;
     }
-  };
+
+    // Normal login
+    login(data.user, data.accessToken);
+
+    toast.success("Welcome back!");
+
+    if (data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/dashboard");
+    }
+
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ||
+      "Login failed"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <AuthLayout

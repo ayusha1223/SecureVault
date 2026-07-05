@@ -21,6 +21,7 @@ import AdminUsers from "./admin/pages/Users";
 import AdminAuditLogs from "./admin/pages/AuditLogs";
 import Statistics from "./admin/pages/Statistics";
 import AdminSettings from "./admin/pages/Settings";
+import VerifyOTP from "./pages/auth/VerifyOTP";
 function App() {
   return (
     <Routes>
@@ -41,6 +42,10 @@ function App() {
         path="/reset-password/:token"
         element={<ResetPassword />}
       />
+      <Route
+  path="/verify-otp"
+  element={<VerifyOTP />}
+/>
       <Route
   path="/vault/new"
   element={

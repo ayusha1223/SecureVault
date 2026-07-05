@@ -22,6 +22,46 @@ const VaultCard = ({
     toast.success("Password copied");
   };
 
+  /* ===========================================
+     Password Expiry
+  =========================================== */
+
+  const today = new Date();
+
+  const expiry = vault.passwordExpiry
+    ? new Date(vault.passwordExpiry)
+    : null;
+
+  let status = null;
+
+  if (expiry) {
+    const diffDays = Math.ceil(
+      (expiry - today) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffDays < 0) {
+      status = {
+        text: "Expired",
+        color:
+          "bg-red-100 text-red-700 border border-red-300",
+      };
+    } else if (diffDays <= 7) {
+      status = {
+        text: `Expires in ${diffDays} day${
+          diffDays !== 1 ? "s" : ""
+        }`,
+        color:
+          "bg-orange-100 text-orange-700 border border-orange-300",
+      };
+    } else {
+      status = {
+        text: "Healthy",
+        color:
+          "bg-green-100 text-green-700 border border-green-300",
+      };
+    }
+  }
+
   return (
     <motion.div
       whileHover={{
@@ -77,6 +117,16 @@ const VaultCard = ({
           </button>
 
         </div>
+
+        {/* Password Status */}
+
+        {status && (
+          <div
+            className={`mt-5 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.color}`}
+          >
+            {status.text}
+          </div>
+        )}
 
         <div className="mt-6 space-y-4">
 

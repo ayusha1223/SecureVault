@@ -1,35 +1,27 @@
-import { getVaults } from "./vaultService";
+import { getVaults, getPasswordHealth } from "./vaultService";
 
 export const getDashboardStats = async () => {
-  const response = await getVaults();
+  const [vaultResponse, healthResponse] =
+    await Promise.all([
+      getVaults(),
+      getPasswordHealth(),
+    ]);
 
-  const vaults = response.data || [];
+  const vaults = vaultResponse.data || [];
 
-  const favourites = vaults.filter(
-    (v) => v.favourite
-  ).length;
-
-  const weakPasswords = vaults.filter(
-    (v) => (v.password || "").length < 12
-  ).length;
-
-  const securityScore =
-    vaults.length === 0
-      ? 100
-      : Math.max(
-          0,
-          Math.round(
-            ((vaults.length - weakPasswords) /
-              vaults.length) *
-              100
-          )
-        );
+  const health = healthResponse.data || {};
 
   return {
-    total: vaults.length,
-    favourites,
-    weakPasswords,
-    securityScore,
+    total: health.total || 0,
+    favourites: vaults.filter((v) => v.favourite).length,
+
+    strongPasswords: health.strong || 0,
+    weakPasswords: health.weak || 0,
+    reusedPasswords: health.reused || 0,
+    expiredPasswords: health.expired || 0,
+
+    securityScore: health.score || 100,
+
     recent: vaults.slice(0, 5),
   };
 };

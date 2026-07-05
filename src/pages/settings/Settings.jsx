@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import api from "../../api/axios";
 
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 
@@ -38,6 +39,18 @@ const Settings = () => {
       [key]: value,
     }));
   };
+  const enableMFA = async () => {
+  try {
+    await api.post("/auth/mfa/enable");
+
+    toast.success("Two-Factor Authentication Enabled");
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message ||
+      "Failed to enable MFA"
+    );
+  }
+};
 
   return (
     <DashboardLayout>
@@ -203,6 +216,25 @@ const Settings = () => {
             </div>
 
           </div>
+          <hr className="my-6" />
+
+<div>
+  <h3 className="mb-2 text-lg font-semibold">
+    Two-Factor Authentication
+  </h3>
+
+  <p className="mb-4 text-sm text-slate-500">
+    Add an extra layer of security by requiring
+    a one-time verification code during login.
+  </p>
+
+  <button
+    onClick={enableMFA}
+    className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+  >
+    Enable Two-Factor Authentication
+  </button>
+</div>
 
         </div>
 

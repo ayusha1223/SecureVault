@@ -23,10 +23,10 @@ const Register = () => {
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const submitHandler = async (e) => {
@@ -35,18 +35,14 @@ const Register = () => {
     try {
       setLoading(true);
 
-      const { data } = await api.post(
-        "/auth/register",
-        form
-      );
+      const { data } = await api.post("/auth/register", form);
 
       toast.success(data.message);
 
       navigate("/login");
     } catch (err) {
       toast.error(
-        err.response?.data?.message ||
-          "Registration failed"
+        err.response?.data?.message || "Registration failed"
       );
     } finally {
       setLoading(false);
@@ -61,6 +57,7 @@ const Register = () => {
       <form
         onSubmit={submitHandler}
         className="space-y-5"
+        autoComplete="off"
       >
         <div className="relative">
           <FiUser className="absolute left-4 top-4 text-slate-400" />
@@ -71,6 +68,7 @@ const Register = () => {
             placeholder="First Name"
             value={form.firstName}
             onChange={handleChange}
+            autoComplete="given-name"
             required
             className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -85,6 +83,7 @@ const Register = () => {
             placeholder="Last Name"
             value={form.lastName}
             onChange={handleChange}
+            autoComplete="family-name"
             required
             className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -99,6 +98,7 @@ const Register = () => {
             placeholder="Email Address"
             value={form.email}
             onChange={handleChange}
+            autoComplete="email"
             required
             className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -110,9 +110,10 @@ const Register = () => {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Create Password"
             value={form.password}
             onChange={handleChange}
+            autoComplete="new-password"
             required
             className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
           />
@@ -121,19 +122,19 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition disabled:opacity-70"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "Creating Account..." : "Create Account"}
         </button>
 
-        <div className="flex justify-center text-sm pt-2">
+        <div className="flex justify-center items-center gap-1 text-sm pt-2">
           <span className="text-slate-600">
             Already have an account?
           </span>
 
           <Link
             to="/login"
-            className="ml-2 text-blue-600 hover:underline font-medium"
+            className="text-blue-600 hover:underline font-medium"
           >
             Sign In
           </Link>
