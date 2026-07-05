@@ -35,9 +35,13 @@ const Login = () => {
 
       login(data.user, data.accessToken);
 
-      toast.success("Welcome back!");
+toast.success("Welcome back!");
 
-      navigate("/dashboard");
+if (data.user.role === "admin") {
+  navigate("/admin");
+} else {
+  navigate("/dashboard");
+}
     } catch (err) {
       toast.error(
         err.response?.data?.message || "Login failed"

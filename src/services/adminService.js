@@ -1,6 +1,6 @@
 import api from "../api/axios";
 
-export const getDashboardStats = async () => {
+export const getAdminDashboard = async () => {
   const { data } = await api.get("/admin/dashboard");
   return data;
 };
@@ -17,6 +17,10 @@ export const lockUser = async (id) => {
 
 export const unlockUser = async (id) => {
   const { data } = await api.put(`/admin/users/${id}/unlock`);
+  return data;
+};
+export const getStatistics = async () => {
+  const { data } = await api.get("/admin/statistics");
   return data;
 };
 

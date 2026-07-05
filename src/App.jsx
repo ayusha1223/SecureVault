@@ -16,7 +16,11 @@ import Profile from "./pages/profile/Profile";
 import Settings from "./pages/settings/Settings";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Audit from "./pages/audit/Audit";
-
+import AdminDashboard from "./admin/pages/AdminDashboard";
+import AdminUsers from "./admin/pages/Users";
+import AdminAuditLogs from "./admin/pages/AuditLogs";
+import Statistics from "./admin/pages/Statistics";
+import AdminSettings from "./admin/pages/Settings";
 function App() {
   return (
     <Routes>
@@ -47,6 +51,22 @@ function App() {
   
 />
 <Route
+  path="/admin/statistics"
+  element={
+    <ProtectedRoute>
+      <Statistics />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/settings"
+  element={
+    <ProtectedRoute>
+      <AdminSettings />
+    </ProtectedRoute>
+  }
+/>
+<Route
   path="/profile"
   element={
     <ProtectedRoute>
@@ -55,10 +75,34 @@ function App() {
   }
 />
 <Route
+  path="/admin/audit-logs"
+  element={
+    <ProtectedRoute>
+      <AdminAuditLogs />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/users"
+  element={
+    <ProtectedRoute>
+      <AdminUsers />
+    </ProtectedRoute>
+  }
+/>
+<Route
   path="/audit"
   element={
     <ProtectedRoute>
       <Audit />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <AdminDashboard />
     </ProtectedRoute>
   }
 />

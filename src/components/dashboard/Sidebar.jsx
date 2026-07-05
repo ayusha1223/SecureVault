@@ -9,7 +9,8 @@ import {
   FiSettings,
   FiLogOut,
   FiPlusCircle,
-  FiActivity
+  FiActivity,
+  FiBarChart2
 } from "react-icons/fi";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -30,8 +31,7 @@ const Sidebar = () => {
       path: "/vault",
       icon: FiLock,
     },
-   
-    
+
     {
       name: "Categories",
       path: "/categories",
