@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
+import AuthLayout from "../../components/layout/AuthLayout";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -14,12 +16,9 @@ const ForgotPassword = () => {
     try {
       setLoading(true);
 
-      const { data } = await api.post(
-        "/auth/forgot-password",
-        {
-          email,
-        }
-      );
+      const { data } = await api.post("/auth/forgot-password", {
+        email,
+      });
 
       toast.success(data.message);
 
@@ -27,7 +26,7 @@ const ForgotPassword = () => {
     } catch (err) {
       toast.error(
         err.response?.data?.message ||
-          "Failed to send reset email"
+          "Unable to send reset email"
       );
     } finally {
       setLoading(false);
@@ -35,69 +34,48 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-      }}
+    <AuthLayout
+      title="Forgot Password"
+      subtitle="Enter your email and we'll send a password reset link."
     >
       <form
         onSubmit={submitHandler}
-        style={{
-          width: 420,
-          background: "#fff",
-          padding: 30,
-          borderRadius: 10,
-          boxShadow: "0 0 20px rgba(0,0,0,.1)",
-        }}
+        className="space-y-5"
       >
-        <h1>Forgot Password</h1>
+        <div className="relative">
+          <FiMail className="absolute left-4 top-4 text-slate-400" />
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 20,
-          }}
-        />
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
         <button
-          type="submit"
           disabled={loading}
-          style={{
-            width: "100%",
-            marginTop: 20,
-            padding: 12,
-            cursor: "pointer",
-          }}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition"
         >
           {loading
             ? "Sending..."
-            : "Send Reset Email"}
+            : "Send Reset Link"}
         </button>
 
-        <div
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-          }}
-        >
-          <Link to="/login">
+        <div className="text-center">
+          <Link
+            to="/login"
+            className="text-blue-600 hover:underline"
+          >
             Back to Login
           </Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 
