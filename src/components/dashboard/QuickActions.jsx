@@ -12,31 +12,31 @@ const QuickActions = () => {
   const actions = [
     {
       title: "Add Password",
-      subtitle: "Save credentials",
+      subtitle: "Save new credentials",
       icon: FiPlus,
       color: "bg-blue-600",
-      action: () => navigate("/vault/new"),
+      action: () => navigate("/vault"),
     },
     {
-      title: "Generator",
-      subtitle: "Strong password",
+      title: "Generate Password",
+      subtitle: "Create secure passwords",
       icon: FiKey,
       color: "bg-green-600",
       action: () => navigate("/generator"),
     },
     {
-      title: "Import",
+      title: "Import Passwords",
       subtitle: "CSV / JSON",
       icon: FiUpload,
       color: "bg-orange-500",
-      action: () => {},
+      action: () => alert("Coming Soon"),
     },
     {
-      title: "Export",
+      title: "Export Passwords",
       subtitle: "Backup vault",
       icon: FiDownload,
       color: "bg-purple-600",
-      action: () => {},
+      action: () => alert("Coming Soon"),
     },
   ];
 
@@ -77,11 +77,13 @@ const QuickActions = () => {
               <p className="mt-2 text-sm text-slate-500">
                 {item.subtitle}
               </p>
+
             </button>
           );
         })}
 
       </div>
+
     </div>
   );
 };

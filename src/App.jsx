@@ -9,6 +9,10 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import Vault from "./pages/vault/Vault";
 import AddPassword from "./pages/vault/AddPassword";
+import PasswordGenerator from "./pages/vault/PasswordGenerator";
+import Categories from "./pages/category/Categories";
+import CategoryVaults from "./pages/category/CategoryVaults";
+import Favourites from "./pages/favourite/Favourites";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 
@@ -39,6 +43,15 @@ function App() {
       <AddPassword />
     </ProtectedRoute>
   }
+  
+/>
+<Route
+  path="/generator"
+  element={
+    <ProtectedRoute>
+      <PasswordGenerator />
+    </ProtectedRoute>
+  }
 />
 
       <Route
@@ -50,6 +63,30 @@ function App() {
   element={
     <ProtectedRoute>
       <Vault />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/categories"
+  element={
+    <ProtectedRoute>
+      <Categories />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/categories/:category"
+  element={
+    <ProtectedRoute>
+      <CategoryVaults />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/favourites"
+  element={
+    <ProtectedRoute>
+      <Favourites />
     </ProtectedRoute>
   }
 />

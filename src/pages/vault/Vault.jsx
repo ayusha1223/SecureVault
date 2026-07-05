@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import VaultCard from "../../components/vault/VaultCard";
-
+import ViewPasswordModal from "../../components/vault/ViewPasswordModal";
+import AddPasswordModal from "../../components/vault/AddPasswordModal";
+import EditPasswordModal from "../../components/vault/EditPasswordModal";
+import DeleteConfirmModal from "../../components/vault/DeleteConfirmModal";
 import {
   getVaults,
   deleteVault,
@@ -17,6 +20,10 @@ const Vault = () => {
   const [vaults, setVaults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+const [selectedVault, setSelectedVault] = useState(null);
+const [editVault, setEditVault] = useState(null);
+const [deleteVaultId, setDeleteVaultId] = useState(null);
+const [openAddModal, setOpenAddModal] = useState(false);
 
   useEffect(() => {
     loadVaults();
@@ -24,60 +31,71 @@ const Vault = () => {
 
   const loadVaults = async () => {
     try {
-      const data = await getVaults();
-      setVaults(data.data);
+      const response = await getVaults();
+      setVaults(response.data || []);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    await deleteVault(id);
+ const confirmDelete = async () => {
+  try {
+    await deleteVault(deleteVaultId);
 
     setVaults((prev) =>
-      prev.filter((v) => v._id !== id)
+      prev.filter(
+        (item) => item._id !== deleteVaultId
+      )
     );
-  };
+
+    setDeleteVaultId(null);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleFavourite = async (id) => {
-    await toggleFavourite(id);
-    loadVaults();
+    try {
+      await toggleFavourite(id);
+      loadVaults();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredVaults = useMemo(() => {
-    return vaults.filter((v) => {
+    return vaults.filter((item) => {
       const q = search.toLowerCase();
 
       return (
-        v.websiteName.toLowerCase().includes(q) ||
-        v.username.toLowerCase().includes(q) ||
-        v.email.toLowerCase().includes(q)
+        item.websiteName?.toLowerCase().includes(q) ||
+        item.username?.toLowerCase().includes(q) ||
+        item.email?.toLowerCase().includes(q)
       );
     });
   }, [vaults, search]);
 
   return (
     <DashboardLayout>
-
       <div className="space-y-8">
 
         <div className="flex items-center justify-between">
 
           <div>
-
             <h1 className="text-4xl font-bold">
               Password Vault
             </h1>
 
             <p className="mt-2 text-slate-500">
-              Securely manage all your credentials.
+              Manage all your saved passwords.
             </p>
-
           </div>
 
           <button
-            onClick={() => navigate("/vault/new")}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+            onClick={() => setOpenAddModal(true)}
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
           >
             <FiPlus />
             Add Password
@@ -88,35 +106,33 @@ const Vault = () => {
         <div className="relative">
 
           <FiSearch
+            size={18}
             className="absolute left-4 top-4 text-slate-400"
           />
 
           <input
+            type="text"
             placeholder="Search passwords..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-            className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-12 pr-4 outline-none focus:border-blue-500"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-2xl border border-slate-300 bg-white py-3 pl-12 pr-4 outline-none focus:border-blue-500"
           />
 
         </div>
 
         {loading ? (
-          <div className="text-center py-20">
+          <div className="py-20 text-center">
             Loading...
           </div>
         ) : filteredVaults.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-slate-300 bg-white py-24 text-center">
-
             <h2 className="text-3xl font-bold">
               No Passwords
             </h2>
 
             <p className="mt-3 text-slate-500">
-              Add your first password to SecureVault.
+              Add your first password.
             </p>
-
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -125,18 +141,39 @@ const Vault = () => {
               <VaultCard
                 key={vault._id}
                 vault={vault}
-                onDelete={handleDelete}
+                onDelete={(id) => setDeleteVaultId(id)}
                 onFavourite={handleFavourite}
-                onView={(v) => console.log(v)}
-                onEdit={(v) => console.log(v)}
+                onView={setSelectedVault}
+                onEdit={(vault) => setEditVault(vault)}
               />
             ))}
 
           </div>
         )}
+        <AddPasswordModal
+  open={openAddModal}
+  onClose={() => setOpenAddModal(false)}
+  onSuccess={loadVaults}
+
+  
+/>
+<EditPasswordModal
+  open={!!editVault}
+  vault={editVault}
+  onClose={() => setEditVault(null)}
+  onSuccess={loadVaults}
+/>
+<DeleteConfirmModal
+  open={!!deleteVaultId}
+  onClose={() => setDeleteVaultId(null)}
+  onDelete={confirmDelete}
+/>
+        <ViewPasswordModal
+          vault={selectedVault}
+          onClose={() => setSelectedVault(null)}
+        />
 
       </div>
-
     </DashboardLayout>
   );
 };

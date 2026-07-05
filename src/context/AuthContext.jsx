@@ -1,41 +1,49 @@
-import { createContext, useContext, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("accessToken");
+  const [user, setUser] = useState(null);
 
-    if (!token) return null;
+ const login = (arg1, arg2) => {
+  // New style: login(user, token)
+  if (typeof arg1 === "object") {
+    localStorage.setItem("user", JSON.stringify(arg1));
+    localStorage.setItem("token", arg2);
+    setUser(arg1);
+    return;
+  }
 
-    try {
-      return jwtDecode(token);
-    } catch {
-      return null;
-    }
-  });
+  localStorage.setItem("token", arg1);
 
-  const login = (accessToken, refreshToken) => {
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-
-    setUser(jwtDecode(accessToken));
-  };
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+};
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
   };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         login,
         logout,
-        authenticated: !!user,
+        isAuthenticated: !!user,
       }}
     >
       {children}

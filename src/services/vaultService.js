@@ -36,6 +36,30 @@ export const favourites = async () => {
 };
 
 export const toggleFavourite = async (id) => {
-  const { data } = await api.patch(`/vault/favourite/${id}`);
+  const { data } = await api.patch(`/vault/${id}/favourite`);
+  return data;
+};
+
+/* ============================
+   Categories
+============================ */
+
+export const getCategories = async () => {
+  const response = await getVaults();
+
+  const vaults = response.data || [];
+
+  const categories = [...new Set(vaults.map((v) => v.category))]
+    .filter(Boolean)
+    .sort();
+
+  return categories;
+};
+
+export const getCategoryVaults = async (category) => {
+  const { data } = await api.get(
+    `/vault/category/${encodeURIComponent(category)}`
+  );
+
   return data;
 };

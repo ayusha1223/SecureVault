@@ -30,7 +30,7 @@ const Topbar = () => {
       <div className="flex items-center gap-4">
 
         <button
-          onClick={() => navigate("/vault/new")}
+          onClick={() => navigate("/vault")}
           className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
         >
           <FiPlus />
