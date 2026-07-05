@@ -7,58 +7,78 @@ import {
 
 const cards = [
   {
-    title: "Stored Passwords",
-    value: "0",
-    icon: <FiLock size={26} />,
-    color: "bg-blue-600",
+    title: "Passwords",
+    value: 126,
+    change: "+12%",
+    color: "from-blue-500 to-blue-700",
+    icon: FiLock,
   },
   {
     title: "Favourites",
-    value: "0",
-    icon: <FiStar size={26} />,
-    color: "bg-yellow-500",
+    value: 18,
+    change: "+3",
+    color: "from-yellow-400 to-orange-500",
+    icon: FiStar,
   },
   {
     title: "Security Score",
-    value: "100%",
-    icon: <FiShield size={26} />,
-    color: "bg-green-600",
+    value: "92%",
+    change: "Excellent",
+    color: "from-green-500 to-emerald-600",
+    icon: FiShield,
   },
   {
     title: "Weak Passwords",
-    value: "0",
-    icon: <FiAlertTriangle size={26} />,
-    color: "bg-red-500",
+    value: 4,
+    change: "-2",
+    color: "from-red-500 to-pink-600",
+    icon: FiAlertTriangle,
   },
 ];
 
 const StatsCards = () => {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => (
-        <div
-          key={card.title}
-          className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">
-                {card.title}
-              </p>
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map((card) => {
+        const Icon = card.icon;
 
-              <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                {card.value}
-              </h2>
-            </div>
-
+        return (
+          <div
+            key={card.title}
+            className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+          >
             <div
-              className={`flex h-14 w-14 items-center justify-center rounded-xl text-white ${card.color}`}
-            >
-              {card.icon}
+              className={`h-2 bg-gradient-to-r ${card.color}`}
+            />
+
+            <div className="flex items-center justify-between p-6">
+
+              <div>
+
+                <p className="text-sm text-slate-500">
+                  {card.title}
+                </p>
+
+                <h2 className="mt-3 text-4xl font-bold text-slate-900">
+                  {card.value}
+                </h2>
+
+                <p className="mt-3 text-sm font-medium text-green-600">
+                  {card.change}
+                </p>
+
+              </div>
+
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${card.color} text-white`}
+              >
+                <Icon size={28} />
+              </div>
+
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

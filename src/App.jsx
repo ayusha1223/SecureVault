@@ -8,6 +8,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import Vault from "./pages/vault/Vault";
+import AddPassword from "./pages/vault/AddPassword";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 
@@ -31,6 +32,14 @@ function App() {
         path="/reset-password/:token"
         element={<ResetPassword />}
       />
+      <Route
+  path="/vault/new"
+  element={
+    <ProtectedRoute>
+      <AddPassword />
+    </ProtectedRoute>
+  }
+/>
 
       <Route
         path="/verify-email/:token"

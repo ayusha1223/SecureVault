@@ -8,14 +8,30 @@ const Dashboard = () => {
     <DashboardLayout>
       <div className="space-y-8">
 
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Dashboard
-          </h1>
+        <div className="flex items-center justify-between">
 
-          <p className="mt-2 text-slate-500">
-            Welcome back! Here's an overview of your SecureVault.
-          </p>
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900">
+              Welcome back 👋
+            </h1>
+
+            <p className="mt-2 text-slate-500">
+              Manage your passwords securely with SecureVault.
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 text-white shadow-lg">
+
+            <p className="text-sm opacity-90">
+              Security Score
+            </p>
+
+            <h2 className="mt-2 text-4xl font-bold">
+              92%
+            </h2>
+
+          </div>
+
         </div>
 
         <StatsCards />
