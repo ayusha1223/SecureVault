@@ -5,26 +5,42 @@ export const getSecurityData = async () => {
 
   const vaults = response.data || [];
 
-  const weakPasswords = vaults.filter(
-    (v) => (v.password || "").length < 12
-  );
-
+  const weakPasswords = [];
   const reused = [];
+  const expired = [];
+  const expiringSoon = [];
 
   const seen = {};
 
-  vaults.forEach((v) => {
-    if (seen[v.password]) {
-      reused.push(v);
+  const today = new Date();
+
+  vaults.forEach((vault) => {
+    if ((vault.password || "").length < 12) {
+      weakPasswords.push(vault);
+    }
+
+    if (seen[vault.password]) {
+      reused.push(vault);
     } else {
-      seen[v.password] = true;
+      seen[vault.password] = true;
+    }
+
+    if (vault.passwordExpiry) {
+      const expiry = new Date(vault.passwordExpiry);
+
+      if (expiry < today) {
+        expired.push(vault);
+      } else {
+        const diff =
+          (expiry - today) /
+          (1000 * 60 * 60 * 24);
+
+        if (diff <= 7) {
+          expiringSoon.push(vault);
+        }
+      }
     }
   });
-
-  const strong =
-    vaults.length -
-    weakPasswords.length -
-    reused.length;
 
   const score =
     vaults.length === 0
@@ -32,7 +48,12 @@ export const getSecurityData = async () => {
       : Math.max(
           0,
           Math.round(
-            (strong / vaults.length) * 100
+            ((vaults.length -
+              weakPasswords.length -
+              reused.length -
+              expired.length) /
+              vaults.length) *
+              100
           )
         );
 
@@ -40,6 +61,8 @@ export const getSecurityData = async () => {
     vaults,
     weakPasswords,
     reused,
+    expired,
+    expiringSoon,
     score,
   };
 };
