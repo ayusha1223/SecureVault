@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { FiLock } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
+import AuthLayout from "../../components/layout/AuthLayout";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -38,58 +40,35 @@ const ResetPassword = () => {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-      }}
+    <AuthLayout
+      title="Reset Password"
+      subtitle="Choose a new secure password."
     >
       <form
         onSubmit={submitHandler}
-        style={{
-          width: 420,
-          background: "#fff",
-          padding: 30,
-          borderRadius: 10,
-          boxShadow: "0 0 20px rgba(0,0,0,.1)",
-        }}
+        className="space-y-5"
       >
-        <h1>Reset Password</h1>
+        <div className="relative">
+          <FiLock className="absolute left-4 top-4 text-slate-400" />
 
-        <input
-          type="password"
-          placeholder="New Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 20,
-          }}
-        />
+          <input
+            type="password"
+            placeholder="New Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
         <button
-          type="submit"
           disabled={loading}
-          style={{
-            width: "100%",
-            marginTop: 20,
-            padding: 12,
-            cursor: "pointer",
-          }}
+          className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
         >
-          {loading
-            ? "Updating..."
-            : "Reset Password"}
+          {loading ? "Updating..." : "Reset Password"}
         </button>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 
