@@ -4,17 +4,24 @@ import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import StatsCards from "../../components/dashboard/StatsCards";
 import QuickActions from "../../components/dashboard/QuickActions";
 import RecentPasswords from "../../components/dashboard/RecentPasswords";
+import SecurityCharts from "../../components/dashboard/SecurityCharts";
 
 import { getDashboardStats } from "../../services/dashboardService";
+import { getVaults } from "../../services/vaultService";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     total: 0,
     favourites: 0,
+    strongPasswords: 0,
     weakPasswords: 0,
+    reusedPasswords: 0,
+    expiredPasswords: 0,
     securityScore: 100,
     recent: [],
   });
+
+  const [passwords, setPasswords] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -24,8 +31,13 @@ const Dashboard = () => {
 
   const loadDashboard = async () => {
     try {
-      const data = await getDashboardStats();
-      setStats(data);
+      const dashboard = await getDashboardStats();
+
+      const vaultResponse = await getVaults();
+
+      setStats(dashboard);
+
+      setPasswords(vaultResponse.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,11 +57,13 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
+
       <div className="space-y-8">
 
         <div className="flex items-center justify-between">
 
           <div>
+
             <h1 className="text-4xl font-bold">
               Welcome back 👋
             </h1>
@@ -57,9 +71,11 @@ const Dashboard = () => {
             <p className="mt-2 text-slate-500">
               Manage your passwords securely.
             </p>
+
           </div>
 
           <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 text-white shadow-lg">
+
             <p className="text-sm opacity-90">
               Security Score
             </p>
@@ -67,17 +83,26 @@ const Dashboard = () => {
             <h2 className="mt-2 text-4xl font-bold">
               {stats.securityScore}%
             </h2>
+
           </div>
 
         </div>
 
         <StatsCards stats={stats} />
 
+        <SecurityCharts
+          stats={stats}
+          passwords={passwords}
+        />
+
         <QuickActions />
 
-        <RecentPasswords passwords={stats.recent} />
+        <RecentPasswords
+          passwords={stats.recent}
+        />
 
       </div>
+
     </DashboardLayout>
   );
 };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiLock, FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -18,6 +19,8 @@ const Login = () => {
     password: "",
   });
 
+  const [captchaToken, setCaptchaToken] = useState("");
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -25,57 +28,62 @@ const Login = () => {
     });
   };
 
- const submitHandler = async (e) => {
-  e.preventDefault();
+  const submitHandler = async (e) => {
+    e.preventDefault();
 
-  try {
-    setLoading(true);
-
-    const { data } = await api.post(
-      "/auth/login",
-      form
-    );
-
-    // MFA required
-    if (data.requiresMFA) {
-      sessionStorage.setItem(
-        "mfaUserId",
-        data.userId
-      );
-
-      sessionStorage.setItem(
-        "mfaEmail",
-        data.email
-      );
-
-      toast.success(data.message);
-
-      navigate("/verify-otp");
-
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA.");
       return;
     }
 
-    // Normal login
-    login(data.user, data.accessToken);
+    try {
+      setLoading(true);
 
-    toast.success("Welcome back!");
+      const { data } = await api.post("/auth/login", {
+        ...form,
+        captchaToken,
+      });
 
-    if (data.user.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/dashboard");
+      // MFA Required
+      if (data.requiresMFA) {
+        sessionStorage.setItem(
+          "mfaUserId",
+          data.userId
+        );
+
+        sessionStorage.setItem(
+          "mfaEmail",
+          data.email
+        );
+
+        toast.success(data.message);
+
+        navigate("/verify-otp");
+
+        return;
+      }
+
+      // Normal Login
+      login(data.user, data.accessToken);
+
+      toast.success("Welcome back!");
+
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+          "Login failed"
+      );
+    } finally {
+      setLoading(false);
     }
-
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message ||
-      "Login failed"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
+console.log("Site Key:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
   return (
     <AuthLayout
       title="Welcome Back"
@@ -95,7 +103,7 @@ const Login = () => {
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -109,18 +117,29 @@ const Login = () => {
             value={form.password}
             onChange={handleChange}
             required
-            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="flex justify-center">
+          <ReCAPTCHA
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+            onChange={(token) =>
+              setCaptchaToken(token)
+            }
           />
         </div>
 
         <button
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition"
+          className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Signing In..." : "Sign In"}
+          {loading
+            ? "Signing In..."
+            : "Sign In"}
         </button>
 
-        <div className="flex justify-between text-sm pt-2">
+        <div className="flex justify-between pt-2 text-sm">
           <Link
             to="/register"
             className="text-blue-600 hover:underline"
