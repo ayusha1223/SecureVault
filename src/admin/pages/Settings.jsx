@@ -3,6 +3,11 @@ import toast from "react-hot-toast";
 
 import AdminLayout from "../components/AdminLayout";
 
+import {
+  getSystemSettings,
+  updateSystemSettings,
+} from "../../services/adminService";
+
 const defaultSettings = {
   autoLogout: 15,
   loginAttempts: 5,
@@ -27,14 +32,20 @@ const Settings = () => {
     useState(defaultSettings);
 
   useEffect(() => {
-    const saved = localStorage.getItem(
-      "adminSettings"
-    );
+  loadSettings();
+}, []);
 
-    if (saved) {
-      setSettings(JSON.parse(saved));
-    }
-  }, []);
+const loadSettings = async () => {
+  try {
+    const response = await getSystemSettings();
+
+    setSettings(response.data);
+  } catch (err) {
+    console.error(err);
+
+    toast.error("Failed to load settings");
+  }
+};
 
   const handleChange = (e) => {
     const { name, value, type, checked } =
@@ -49,16 +60,17 @@ const Settings = () => {
     }));
   };
 
-  const saveSettings = () => {
-    localStorage.setItem(
-      "adminSettings",
-      JSON.stringify(settings)
-    );
+  const saveSettings = async () => {
+  try {
+    await updateSystemSettings(settings);
 
-    toast.success(
-      "Settings saved successfully"
-    );
-  };
+    toast.success("Settings updated successfully.");
+  } catch (err) {
+    console.error(err);
+
+    toast.error("Failed to update settings.");
+  }
+};
 
   return (
     <AdminLayout>

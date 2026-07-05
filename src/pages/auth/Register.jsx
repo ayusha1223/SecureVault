@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+} from "react-icons/fi";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
+import AuthLayout from "../../components/layout/AuthLayout";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -23,7 +29,7 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     try {
@@ -48,108 +54,92 @@ const Register = () => {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-      }}
+    <AuthLayout
+      title="Create Account"
+      subtitle="Join SecureVault and protect your digital information."
     >
       <form
-        onSubmit={handleSubmit}
-        style={{
-          width: 420,
-          background: "#fff",
-          padding: 30,
-          borderRadius: 10,
-          boxShadow: "0 0 20px rgba(0,0,0,.1)",
-        }}
+        onSubmit={submitHandler}
+        className="space-y-5"
       >
-        <h1>Create Account</h1>
+        <div className="relative">
+          <FiUser className="absolute left-4 top-4 text-slate-400" />
 
-        <input
-          name="firstName"
-          placeholder="First Name"
-          value={form.firstName}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 20,
-          }}
-        />
+          <input
+            type="text"
+            name="firstName"
+            placeholder="First Name"
+            value={form.firstName}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
-        <input
-          name="lastName"
-          placeholder="Last Name"
-          value={form.lastName}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 15,
-          }}
-        />
+        <div className="relative">
+          <FiUser className="absolute left-4 top-4 text-slate-400" />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 15,
-          }}
-        />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={form.lastName}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 15,
-          }}
-        />
+        <div className="relative">
+          <FiMail className="absolute left-4 top-4 text-slate-400" />
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
+
+        <div className="relative">
+          <FiLock className="absolute left-4 top-4 text-slate-400" />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 20,
-            cursor: "pointer",
-          }}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition disabled:opacity-70"
         >
-          {loading ? "Creating..." : "Register"}
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
 
-        <div
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-          }}
-        >
-          Already have an account?
+        <div className="flex justify-center text-sm pt-2">
+          <span className="text-slate-600">
+            Already have an account?
+          </span>
 
-          <Link to="/login">
-            {" "}Login
+          <Link
+            to="/login"
+            className="ml-2 text-blue-600 hover:underline font-medium"
+          >
+            Sign In
           </Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 

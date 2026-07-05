@@ -33,3 +33,15 @@ export const getAuditLogs = async () => {
   const { data } = await api.get("/admin/audit-logs");
   return data;
 };
+export const getSystemSettings = async () => {
+  const { data } = await api.get("/admin/settings");
+  return data;
+};
+
+export const updateSystemSettings = async (settings) => {
+  const { data } = await api.put(
+    "/admin/settings",
+    settings
+  );
+  return data;
+};
