@@ -2,7 +2,9 @@ import {
   FiAlertTriangle,
   FiLock,
   FiShield,
-  FiStar,
+  FiRefreshCw,
+  FiClock,
+  FiCheckCircle,
 } from "react-icons/fi";
 
 import StatCard from "./StatCard";
@@ -16,13 +18,48 @@ const StatsCards = ({ stats }) => {
       icon: FiLock,
       gradient: "from-blue-500 to-blue-700",
     },
+
     {
-      title: "Favourites",
-      value: stats.favourites,
-      subtitle: "Quick access",
-      icon: FiStar,
-      gradient: "from-yellow-400 to-orange-500",
+      title: "Strong Passwords",
+      value: stats.strongPasswords,
+      subtitle: "Highly secure",
+      icon: FiCheckCircle,
+      gradient: "from-green-500 to-emerald-600",
     },
+
+    {
+      title: "Weak Passwords",
+      value: stats.weakPasswords,
+      subtitle:
+        stats.weakPasswords === 0
+          ? "Excellent"
+          : "Needs attention",
+      icon: FiAlertTriangle,
+      gradient: "from-red-500 to-pink-600",
+    },
+
+    {
+      title: "Reused Passwords",
+      value: stats.reusedPasswords,
+      subtitle:
+        stats.reusedPasswords === 0
+          ? "No duplicates"
+          : "Change immediately",
+      icon: FiRefreshCw,
+      gradient: "from-orange-500 to-yellow-500",
+    },
+
+    {
+      title: "Expired Passwords",
+      value: stats.expiredPasswords,
+      subtitle:
+        stats.expiredPasswords === 0
+          ? "Up to date"
+          : "Update now",
+      icon: FiClock,
+      gradient: "from-rose-500 to-red-600",
+    },
+
     {
       title: "Security Score",
       value: `${stats.securityScore}%`,
@@ -31,24 +68,14 @@ const StatsCards = ({ stats }) => {
           ? "Excellent"
           : stats.securityScore >= 70
           ? "Good"
-          : "Needs improvement",
+          : "Needs Improvement",
       icon: FiShield,
-      gradient: "from-green-500 to-emerald-600",
-    },
-    {
-      title: "Weak Passwords",
-      value: stats.weakPasswords,
-      subtitle:
-        stats.weakPasswords === 0
-          ? "No weak passwords"
-          : "Needs attention",
-      icon: FiAlertTriangle,
-      gradient: "from-red-500 to-pink-600",
+      gradient: "from-cyan-500 to-blue-600",
     },
   ];
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
       {cards.map((card) => (
         <StatCard
           key={card.title}
