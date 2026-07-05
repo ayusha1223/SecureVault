@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FiLock, FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import AuthLayout from "../../components/layout/AuthLayout";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -23,7 +25,7 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     try {
@@ -33,7 +35,7 @@ const Login = () => {
 
       login(data.accessToken, data.refreshToken);
 
-      toast.success("Login successful");
+      toast.success("Welcome back!");
 
       navigate("/dashboard");
     } catch (err) {
@@ -46,85 +48,66 @@ const Login = () => {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-      }}
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Login to your SecureVault account."
     >
       <form
-        onSubmit={handleSubmit}
-        style={{
-          width: 400,
-          background: "#fff",
-          padding: 30,
-          borderRadius: 10,
-          boxShadow: "0 0 20px rgba(0,0,0,.1)",
-        }}
+        onSubmit={submitHandler}
+        className="space-y-5"
       >
-        <h1>SecureVault</h1>
+        <div className="relative">
+          <FiMail className="absolute left-4 top-4 text-slate-400" />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 20,
-          }}
-        />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          style={{
-            width: "100%",
-            padding: 12,
-            marginTop: 15,
-          }}
-        />
+        <div className="relative">
+          <FiLock className="absolute left-4 top-4 text-slate-400" />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full border rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
         <button
-          type="submit"
           disabled={loading}
-          style={{
-            width: "100%",
-            marginTop: 20,
-            padding: 12,
-            cursor: "pointer",
-          }}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition"
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Signing In..." : "Sign In"}
         </button>
 
-        <div
-          style={{
-            marginTop: 20,
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Link to="/register">
-            Register
+        <div className="flex justify-between text-sm pt-2">
+          <Link
+            to="/register"
+            className="text-blue-600 hover:underline"
+          >
+            Create account
           </Link>
 
-          <Link to="/forgot-password">
-            Forgot Password?
+          <Link
+            to="/forgot-password"
+            className="text-blue-600 hover:underline"
+          >
+            Forgot password?
           </Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 
