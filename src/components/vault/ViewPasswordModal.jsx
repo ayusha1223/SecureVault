@@ -1,15 +1,46 @@
-import { FiCopy, FiEye, FiEyeOff, FiX } from "react-icons/fi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  FiCopy,
+  FiEye,
+  FiEyeOff,
+  FiX,
+} from "react-icons/fi";
 import toast from "react-hot-toast";
+
+import { getVault } from "../../services/vaultService";
 
 const ViewPasswordModal = ({ vault, onClose }) => {
   const [show, setShow] = useState(false);
+  const [vaultDetails, setVaultDetails] = useState(null);
+
+  useEffect(() => {
+    if (!vault) {
+      setVaultDetails(null);
+      return;
+    }
+
+    const loadVault = async () => {
+      try {
+        const response = await getVault(vault._id);
+
+        setVaultDetails(response.data);
+      } catch (err) {
+        console.error(err);
+
+        toast.error("Failed to load password");
+      }
+    };
+
+    loadVault();
+  }, [vault]);
 
   if (!vault) return null;
 
   const copyPassword = async () => {
     try {
-      await navigator.clipboard.writeText(vault.password);
+      await navigator.clipboard.writeText(
+        vaultDetails?.password || ""
+      );
 
       toast.success("Password copied");
 
@@ -17,7 +48,6 @@ const ViewPasswordModal = ({ vault, onClose }) => {
         localStorage.getItem("settings") || "{}"
       );
 
-      // Default = 30 seconds
       const seconds =
         settings.clipboardAutoClear || 30;
 
@@ -42,6 +72,7 @@ const ViewPasswordModal = ({ vault, onClose }) => {
       <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
 
         <div className="mb-8 flex items-center justify-between">
+
           <div>
             <h2 className="text-3xl font-bold">
               {vault.websiteName}
@@ -58,32 +89,37 @@ const ViewPasswordModal = ({ vault, onClose }) => {
           >
             <FiX size={22} />
           </button>
+
         </div>
 
         <div className="space-y-5">
 
           <div>
+
             <label className="text-sm text-slate-500">
               Username
             </label>
 
             <input
-              value={vault.username}
+              value={vault.username || ""}
               readOnly
               className="mt-2 w-full rounded-xl border p-3"
             />
+
           </div>
 
           <div>
+
             <label className="text-sm text-slate-500">
               Email
             </label>
 
             <input
-              value={vault.email}
+              value={vault.email || ""}
               readOnly
               className="mt-2 w-full rounded-xl border p-3"
             />
+
           </div>
 
           <div>
@@ -97,7 +133,7 @@ const ViewPasswordModal = ({ vault, onClose }) => {
               <input
                 readOnly
                 type={show ? "text" : "password"}
-                value={vault.password}
+                value={vaultDetails?.password || ""}
                 className="flex-1 rounded-l-xl border border-r-0 p-3"
               />
 
