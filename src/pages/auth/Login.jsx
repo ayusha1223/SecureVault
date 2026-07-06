@@ -45,6 +45,7 @@ const Login = () => {
         ...form,
         captchaToken,
       });
+      console.log("LOGIN SUCCESS:", data);
 
       // MFA Required
       if (data.requiresMFA) {
