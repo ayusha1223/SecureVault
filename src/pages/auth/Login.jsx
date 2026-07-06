@@ -38,7 +38,7 @@ const Login = () => {
 
     try {
       setLoading(true);
-
+      console.log("Captcha Token:", captchaToken);
       const { data } = await api.post("/auth/login", {
         ...form,
         captchaToken,
