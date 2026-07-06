@@ -11,6 +11,9 @@ const Audit = () => {
   const [logs, setLogs] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const logsPerPage = 10;
 
   useEffect(() => {
     loadLogs();
@@ -40,6 +43,15 @@ const Audit = () => {
     });
   }, [logs, search, filter]);
 
+  const totalPages = Math.ceil(
+    filteredLogs.length / logsPerPage
+  );
+
+  const currentLogs = filteredLogs.slice(
+    (currentPage - 1) * logsPerPage,
+    currentPage * logsPerPage
+  );
+
   const actions = [
     "ALL",
     ...new Set(logs.map((l) => l.action)),
@@ -47,11 +59,9 @@ const Audit = () => {
 
   return (
     <DashboardLayout>
-
       <div className="space-y-8">
 
         <div>
-
           <h1 className="text-4xl font-bold">
             Audit Logs
           </h1>
@@ -59,7 +69,6 @@ const Audit = () => {
           <p className="mt-2 text-slate-500">
             Track all account activity.
           </p>
-
         </div>
 
         <div className="flex flex-col gap-4 md:flex-row">
@@ -71,9 +80,10 @@ const Audit = () => {
             <input
               placeholder="Search..."
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full rounded-xl border py-3 pl-12 pr-4"
             />
 
@@ -81,9 +91,10 @@ const Audit = () => {
 
           <select
             value={filter}
-            onChange={(e) =>
-              setFilter(e.target.value)
-            }
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="rounded-xl border px-4"
           >
             {actions.map((action) => (
@@ -103,9 +114,7 @@ const Audit = () => {
           <table className="w-full">
 
             <thead className="bg-slate-100">
-
               <tr>
-
                 <th className="p-4 text-left">
                   Action
                 </th>
@@ -125,14 +134,12 @@ const Audit = () => {
                 <th className="p-4 text-left">
                   Date
                 </th>
-
               </tr>
-
             </thead>
 
             <tbody>
 
-              {filteredLogs.map((log) => (
+              {currentLogs.map((log) => (
 
                 <tr
                   key={log._id}
@@ -140,15 +147,10 @@ const Audit = () => {
                 >
 
                   <td className="p-4">
-
                     <div className="flex items-center gap-2">
-
                       <FiActivity />
-
                       {log.action}
-
                     </div>
-
                   </td>
 
                   <td className="p-4">
@@ -156,7 +158,6 @@ const Audit = () => {
                   </td>
 
                   <td className="p-4">
-
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         log.status === "SUCCESS"
@@ -166,7 +167,6 @@ const Audit = () => {
                     >
                       {log.status}
                     </span>
-
                   </td>
 
                   <td className="p-4">
@@ -187,10 +187,57 @@ const Audit = () => {
 
           </table>
 
+          <div className="flex items-center justify-between border-t px-6 py-4">
+
+            <p className="text-sm text-slate-500">
+              Showing{" "}
+              {filteredLogs.length === 0
+                ? 0
+                : (currentPage - 1) * logsPerPage + 1}
+              {" - "}
+              {Math.min(
+                currentPage * logsPerPage,
+                filteredLogs.length
+              )}{" "}
+              of {filteredLogs.length}
+            </p>
+
+            <div className="flex items-center gap-3">
+
+              <button
+                disabled={currentPage === 1}
+                onClick={() =>
+                  setCurrentPage((prev) => prev - 1)
+                }
+                className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              <span className="font-medium">
+                {currentPage} / {totalPages || 1}
+              </span>
+
+              <button
+                disabled={
+                  currentPage === totalPages ||
+                  totalPages === 0
+                }
+                onClick={() =>
+                  setCurrentPage((prev) => prev + 1)
+                }
+                className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
 
       </div>
-
     </DashboardLayout>
   );
 };

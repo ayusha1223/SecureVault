@@ -28,25 +28,6 @@ const Topbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-
-        <button
-          onClick={() => navigate("/vault")}
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          <FiPlus />
-          Add Password
-        </button>
-
-        <button className="rounded-xl bg-slate-100 p-3 hover:bg-slate-200">
-          <FiMoon size={18} />
-        </button>
-
-        <button className="relative rounded-xl bg-slate-100 p-3 hover:bg-slate-200">
-          <FiBell size={18} />
-
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"></span>
-        </button>
-
       </div>
 
     </header>

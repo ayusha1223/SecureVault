@@ -37,45 +37,35 @@ export const AuthProvider = ({ children }) => {
   };
 
   /* ===========================================
-     Load System Settings
+     Load System Settings (Admin Only)
   =========================================== */
 
-const loadSystemSettings = async () => {
-  try {
-    const { data } = await api.get("/admin/settings");
+  const loadSystemSettings = async () => {
+    try {
+      const { data } = await api.get("/admin/settings");
 
-    console.log("SETTINGS FROM SERVER");
-    console.log(data);
+      autoLogoutMinutes.current =
+        data.data.autoLogout || 15;
 
-    autoLogoutMinutes.current =
-      data.data.autoLogout || 15;
+    } catch (err) {
+      console.error(err);
 
-    console.log(
-      "AUTO LOGOUT:",
-      autoLogoutMinutes.current
-    );
-  } catch (err) {
-    console.error(err);
-
-    autoLogoutMinutes.current = 15;
-  }
-};
+      autoLogoutMinutes.current = 15;
+    }
+  };
 
   /* ===========================================
      Reset Timer
   =========================================== */
 
-const resetTimer = () => {
-  clearTimeout(timer.current);
+  const resetTimer = () => {
+    clearTimeout(timer.current);
 
-  console.log("RESET:", new Date().toLocaleTimeString());
+    timer.current = setTimeout(() => {
+      logout();
+    }, autoLogoutMinutes.current * 60 * 1000);
+  };
 
-  timer.current = setTimeout(() => {
-    console.log("LOGGING OUT");
-
-    logout();
-  }, autoLogoutMinutes.current * 60 * 1000);
-};
   /* ===========================================
      Login
   =========================================== */
@@ -90,7 +80,11 @@ const resetTimer = () => {
 
     setUser(userData);
 
-    await loadSystemSettings();
+    if (userData.role === "admin") {
+      await loadSystemSettings();
+    } else {
+      autoLogoutMinutes.current = 15;
+    }
 
     resetTimer();
   };
@@ -101,19 +95,20 @@ const resetTimer = () => {
 
   useEffect(() => {
     const initialize = async () => {
-      const storedUser =
-        localStorage.getItem("user");
+      const storedUser = localStorage.getItem("user");
 
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
 
-       if (userData.role === "admin") {
-  await loadSystemSettings();
-} else {
-  autoLogoutMinutes.current = 15;
-}
+        setUser(parsedUser);
 
-resetTimer();
+        if (parsedUser.role === "admin") {
+          await loadSystemSettings();
+        } else {
+          autoLogoutMinutes.current = 15;
+        }
+
+        resetTimer();
       }
     };
 
