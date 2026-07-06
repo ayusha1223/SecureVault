@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiLock, FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -20,6 +20,7 @@ const Login = () => {
   });
 
   const [captchaToken, setCaptchaToken] = useState("");
+  const captchaRef = useRef(null);
 
   const handleChange = (e) => {
     setForm({
@@ -38,6 +39,7 @@ const Login = () => {
 
     try {
       setLoading(true);
+      console.log("Captcha Token:", captchaToken);
       console.log("Captcha Token:", captchaToken);
       const { data } = await api.post("/auth/login", {
         ...form,
@@ -80,8 +82,11 @@ const Login = () => {
           "Login failed"
       );
     } finally {
-      setLoading(false);
-    }
+  setLoading(false);
+
+  captchaRef.current?.reset();
+  setCaptchaToken("");
+}
   };
 console.log("Site Key:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
   return (
@@ -123,11 +128,10 @@ console.log("Site Key:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
 
         <div className="flex justify-center">
           <ReCAPTCHA
-            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-            onChange={(token) =>
-              setCaptchaToken(token)
-            }
-          />
+  ref={captchaRef}
+  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+  onChange={(token) => setCaptchaToken(token)}
+/>
         </div>
 
         <button
