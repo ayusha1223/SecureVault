@@ -107,9 +107,13 @@ const resetTimer = () => {
       if (storedUser) {
         setUser(JSON.parse(storedUser));
 
-        await loadSystemSettings();
+       if (userData.role === "admin") {
+  await loadSystemSettings();
+} else {
+  autoLogoutMinutes.current = 15;
+}
 
-        resetTimer();
+resetTimer();
       }
     };
 
