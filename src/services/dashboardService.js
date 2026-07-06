@@ -8,17 +8,23 @@ export const getDashboardStats = async () => {
     ]);
 
   const vaults = vaultResponse.data || [];
-
   const health = healthResponse.data || {};
 
   return {
-    total: health.total || 0,
-    favourites: vaults.filter((v) => v.favourite).length,
+    total: health.vaults?.length || 0,
 
-    strongPasswords: health.strong || 0,
-    weakPasswords: health.weak || 0,
-    reusedPasswords: health.reused || 0,
-    expiredPasswords: health.expired || 0,
+    favourites: vaults.filter(
+      (v) => v.favourite
+    ).length,
+
+    weakPasswords:
+      health.weakPasswords?.length || 0,
+
+    reusedPasswords:
+      health.reused?.length || 0,
+
+    expiredPasswords:
+      health.expired?.length || 0,
 
     securityScore: health.score || 100,
 
