@@ -21,25 +21,26 @@ export const AuthProvider = ({ children }) => {
 
   const [user, setUser] = useState(null);
 
-  /* ===========================================
-     Logout
-  =========================================== */
+  
+    //  Logout
+ const logout = async () => {
+   console.log("Logout called");
+  try {
+    await api.post("/auth/logout");
+  } catch (err) {
+    console.error(err);
+  }
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 
-    setUser(null);
+  setUser(null);
 
-    toast("Session expired due to inactivity.");
+  toast("Logged out successfully.");
 
-    navigate("/login");
-  };
-
-  /* ===========================================
-     Load System Settings (Admin Only)
-  =========================================== */
-
+  navigate("/login");
+};
+    //  Load System Settings (Admin Only)
   const loadSystemSettings = async () => {
     try {
       const { data } = await api.get("/admin/settings");
@@ -54,22 +55,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /* ===========================================
-     Reset Timer
-  =========================================== */
+  //  Reset Timer
 
-  const resetTimer = () => {
-    clearTimeout(timer.current);
+const resetTimer = () => {
+  clearTimeout(timer.current);
 
-    timer.current = setTimeout(() => {
-      logout();
-    }, autoLogoutMinutes.current * 60 * 1000);
-  };
+  timer.current = setTimeout(async () => {
+    await logout();
+  }, autoLogoutMinutes.current * 60 * 1000);
+};
 
-  /* ===========================================
-     Login
-  =========================================== */
+const loadUserSettings = () => {
+  const saved = localStorage.getItem("settings");
 
+  if (saved) {
+    const settings = JSON.parse(saved);
+    autoLogoutMinutes.current = settings.autoLogout || 15;
+  } else {
+    autoLogoutMinutes.current = 15;
+  }
+};
+    //  Login
+  
   const login = async (userData, token) => {
     localStorage.setItem("token", token);
 
@@ -81,18 +88,15 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
 
     if (userData.role === "admin") {
-      await loadSystemSettings();
-    } else {
-      autoLogoutMinutes.current = 15;
-    }
+  await loadSystemSettings();
+} else {
+  loadUserSettings();
+}
+     console.log("Timer started:", autoLogoutMinutes.current);
 
     resetTimer();
   };
-
-  /* ===========================================
-     Initial Load
-  =========================================== */
-
+    //  Initial Load
   useEffect(() => {
     const initialize = async () => {
       const storedUser = localStorage.getItem("user");
@@ -105,7 +109,7 @@ export const AuthProvider = ({ children }) => {
         if (parsedUser.role === "admin") {
           await loadSystemSettings();
         } else {
-          autoLogoutMinutes.current = 15;
+          loadUserSettings();
         }
 
         resetTimer();
@@ -115,12 +119,10 @@ export const AuthProvider = ({ children }) => {
     initialize();
 
     const events = [
-      "mousemove",
-      "keydown",
-      "mousedown",
-      "scroll",
-      "touchstart",
-    ];
+  "keydown",
+  "mousedown",
+  "touchstart",
+];
 
     events.forEach((event) =>
       window.addEventListener(event, resetTimer)
@@ -139,15 +141,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        setUser,
-        login,
-        logout,
-        isAuthenticated: !!user,
-      }}
-    >
+   <AuthContext.Provider
+  value={{
+    user,
+    setUser,
+    login,
+    logout,
+    resetTimer,
+    isAuthenticated: !!user,
+  }}
+>
       {children}
     </AuthContext.Provider>
   );

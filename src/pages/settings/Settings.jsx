@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "../../api/axios";
-
+import { useAuth } from "../../context/AuthContext";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 
 const Settings = () => {
+  const { resetTimer } = useAuth();
   const [settings, setSettings] = useState({
     darkMode: false,
     autoLogout: 15,
@@ -24,14 +25,16 @@ const Settings = () => {
     }
   }, []);
 
-  const saveSettings = () => {
-    localStorage.setItem(
-      "settings",
-      JSON.stringify(settings)
-    );
+ const saveSettings = () => {
+  localStorage.setItem(
+    "settings",
+    JSON.stringify(settings)
+  );
 
-    toast.success("Settings Saved");
-  };
+  resetTimer();
+
+  toast.success("Settings Saved");
+};
 
   const update = (key, value) => {
     setSettings((prev) => ({

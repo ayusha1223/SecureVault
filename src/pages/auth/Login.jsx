@@ -67,15 +67,15 @@ const Login = () => {
       }
 
       // Normal Login
-      login(data.user, data.accessToken);
+     await login(data.user, data.accessToken);
 
-      toast.success("Welcome back!");
+toast.success("Welcome back!");
 
-      if (data.user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
+if (data.user.role === "admin") {
+  navigate("/admin");
+} else {
+  navigate("/dashboard");
+}
 
     } catch (err) {
       toast.error(
