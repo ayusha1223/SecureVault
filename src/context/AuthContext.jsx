@@ -20,109 +20,121 @@ export const AuthProvider = ({ children }) => {
   const autoLogoutMinutes = useRef(15);
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  
-    //  Logout
- const logout = async () => {
-   console.log("Logout called");
-  try {
-    await api.post("/auth/logout");
-  } catch (err) {
-    console.error(err);
-  }
+  /* ===========================================
+     Logout
+  =========================================== */
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      // Session may already be gone - clear locally regardless
+    }
 
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    localStorage.removeItem("user");
 
-  setUser(null);
+    setUser(null);
 
-  toast("Logged out successfully.");
+    toast("Logged out successfully.");
 
-  navigate("/login");
-};
-    //  Load System Settings (Admin Only)
+    navigate("/login");
+  };
+
+  /* ===========================================
+     Load System Settings (Admin Only)
+  =========================================== */
   const loadSystemSettings = async () => {
     try {
       const { data } = await api.get("/admin/settings");
-
-      autoLogoutMinutes.current =
-        data.data.autoLogout || 15;
-
+      autoLogoutMinutes.current = data.data.autoLogout || 15;
     } catch (err) {
-      console.error(err);
-
       autoLogoutMinutes.current = 15;
     }
   };
 
-  //  Reset Timer
+  const loadUserSettings = () => {
+    const saved = localStorage.getItem("settings");
 
-const resetTimer = () => {
-  clearTimeout(timer.current);
+    if (saved) {
+      const settings = JSON.parse(saved);
+      autoLogoutMinutes.current = settings.autoLogout || 15;
+    } else {
+      autoLogoutMinutes.current = 15;
+    }
+  };
 
-  timer.current = setTimeout(async () => {
-    await logout();
-  }, autoLogoutMinutes.current * 60 * 1000);
-};
+  /* ===========================================
+     Idle Timer
+  =========================================== */
+  const resetTimer = () => {
+    clearTimeout(timer.current);
 
-const loadUserSettings = () => {
-  const saved = localStorage.getItem("settings");
+    timer.current = setTimeout(async () => {
+      await logout();
+    }, autoLogoutMinutes.current * 60 * 1000);
+  };
 
-  if (saved) {
-    const settings = JSON.parse(saved);
-    autoLogoutMinutes.current = settings.autoLogout || 15;
-  } else {
-    autoLogoutMinutes.current = 15;
-  }
-};
-    //  Login
-  
-  const login = async (userData, token) => {
-    localStorage.setItem("token", token);
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(userData)
-    );
+  /* ===========================================
+     Login
+     The access token is set by the server as an
+     HttpOnly cookie and is never stored in JS.
+  =========================================== */
+  const login = async (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
 
     setUser(userData);
 
     if (userData.role === "admin") {
-  await loadSystemSettings();
-} else {
-  loadUserSettings();
-}
-     console.log("Timer started:", autoLogoutMinutes.current);
+      await loadSystemSettings();
+    } else {
+      loadUserSettings();
+    }
 
     resetTimer();
   };
-    //  Initial Load
+
+  /* ===========================================
+     Initial Load
+     Restore the session from the server, not from
+     localStorage - the cookie is the source of truth.
+  =========================================== */
   useEffect(() => {
     const initialize = async () => {
       const storedUser = localStorage.getItem("user");
 
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
+      if (!storedUser) {
+        setLoading(false);
+        return;
+      }
 
-        setUser(parsedUser);
+      try {
+        // Confirm the HttpOnly cookie is still valid
+        const { data } = await api.get("/users/profile");
 
-        if (parsedUser.role === "admin") {
+        const currentUser = data.data || JSON.parse(storedUser);
+
+        setUser(currentUser);
+
+        if (currentUser.role === "admin") {
           await loadSystemSettings();
         } else {
           loadUserSettings();
         }
 
         resetTimer();
+      } catch (err) {
+        // Cookie expired or absent - drop the stale local copy
+        localStorage.removeItem("user");
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
 
     initialize();
 
-    const events = [
-  "keydown",
-  "mousedown",
-  "touchstart",
-];
+    const events = ["keydown", "mousedown", "touchstart"];
 
     events.forEach((event) =>
       window.addEventListener(event, resetTimer)
@@ -132,29 +144,26 @@ const loadUserSettings = () => {
       clearTimeout(timer.current);
 
       events.forEach((event) =>
-        window.removeEventListener(
-          event,
-          resetTimer
-        )
+        window.removeEventListener(event, resetTimer)
       );
     };
   }, []);
 
   return (
-   <AuthContext.Provider
-  value={{
-    user,
-    setUser,
-    login,
-    logout,
-    resetTimer,
-    isAuthenticated: !!user,
-  }}
->
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        login,
+        logout,
+        resetTimer,
+        loading,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () =>
-  useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);

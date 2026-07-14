@@ -13,10 +13,14 @@ const VerifyOTP = () => {
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(300);
 
   const email = sessionStorage.getItem("mfaEmail");
-  const userId = sessionStorage.getItem("mfaUserId");
+
+  // Server-issued MFA session token (replaces client-supplied userId)
+  const [mfaToken, setMfaToken] = useState(
+    sessionStorage.getItem("mfaToken")
+  );
 
   // Countdown Timer
   useEffect(() => {
@@ -36,13 +40,13 @@ const VerifyOTP = () => {
       setLoading(true);
 
       const { data } = await api.post("/auth/mfa/verify", {
-        userId,
+        mfaToken,
         otp,
       });
 
-      login(data.user, data.accessToken);
+      login(data.user);
 
-      sessionStorage.removeItem("mfaUserId");
+      sessionStorage.removeItem("mfaToken");
       sessionStorage.removeItem("mfaEmail");
 
       toast.success("Login successful");
@@ -63,9 +67,13 @@ const VerifyOTP = () => {
 
   const resendOTP = async () => {
     try {
-      await api.post("/auth/mfa/resend", {
-        userId,
+      const { data } = await api.post("/auth/mfa/resend", {
+        mfaToken,
       });
+
+      // The server rotates the MFA session token on every resend
+      setMfaToken(data.mfaToken);
+      sessionStorage.setItem("mfaToken", data.mfaToken);
 
       setOtp("");
       setTimeLeft(30);

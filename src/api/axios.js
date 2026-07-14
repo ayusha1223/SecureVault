@@ -1,21 +1,17 @@
 import axios from "axios";
 
+// Use an explicit URL if provided, otherwise derive from the current host.
+// Works on localhost, 192.168.x.x, or any LAN IP without a rebuild.
+const baseURL =
+  import.meta.env.VITE_API_URL ||
+  `http://${window.location.hostname}:5000/api`;
+
 const api = axios.create({
-  baseURL: "http://192.168.1.74:5000/api",
+  baseURL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
 });
 
 // Auto logout when JWT expires

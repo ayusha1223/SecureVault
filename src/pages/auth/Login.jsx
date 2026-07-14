@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiLock, FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
 import ReCAPTCHA from "react-google-recaptcha";
-
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import AuthLayout from "../../components/layout/AuthLayout";
@@ -39,19 +38,15 @@ const Login = () => {
 
     try {
       setLoading(true);
-      console.log("Captcha Token:", captchaToken);
-      console.log("Captcha Token:", captchaToken);
       const { data } = await api.post("/auth/login", {
         ...form,
         captchaToken,
       });
-      console.log("LOGIN SUCCESS:", data);
-
-      // MFA Required
+      // MFA Required - store the server-issued MFA session token
       if (data.requiresMFA) {
         sessionStorage.setItem(
-          "mfaUserId",
-          data.userId
+          "mfaToken",
+          data.mfaToken
         );
 
         sessionStorage.setItem(
@@ -67,7 +62,7 @@ const Login = () => {
       }
 
       // Normal Login
-     await login(data.user, data.accessToken);
+     await login(data.user);
 
 toast.success("Welcome back!");
 
@@ -89,7 +84,6 @@ if (data.user.role === "admin") {
   setCaptchaToken("");
 }
   };
-console.log("Site Key:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
   return (
     <AuthLayout
       title="Welcome Back"
